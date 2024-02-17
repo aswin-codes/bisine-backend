@@ -53,7 +53,7 @@ router.post('/auth', async (req, res) => {
   
       if (user) {
         // User exists, generate JWT token and send user details
-        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY,{expiresIn: "14h"});
         res.status(200).json({ user, access_token:  token, });
       } else {
         // User does not exist, send status code 404

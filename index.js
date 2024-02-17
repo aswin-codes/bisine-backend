@@ -6,6 +6,7 @@ dotenv.config();
 
 const server = express();
 const userRouter = require('./Router/user.js');
+const shopRouter = require("./Router/shop.js")
 
 server.use(express.json());
 server.use(cors());
@@ -17,6 +18,7 @@ server.get('/test', async (req,res) => {
 });
 
 server.use("/api/user",userRouter);
+server.use("/api/shop",shopRouter)
 
 
 server.listen(3000,() => {
