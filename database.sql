@@ -33,3 +33,15 @@ CREATE TABLE shop (
     owner_email VARCHAR(255) REFERENCES users(email)
 );
 
+--Product table (Inventory)
+CREATE TABLE product (
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    product_description TEXT,
+    product_tags TEXT[],
+    product_image_urls TEXT[],
+    variants JSONB[],
+    shop_id VARCHAR(255) REFERENCES shop(unique_id) ON DELETE CASCADE
+);
+
+

@@ -115,7 +115,7 @@ router.post('/create',verifyToken, async (req, res) => {
   
       await pool.query(query, values);
   
-      res.status(201).send('Shop created successfully');
+      res.status(201).json({ message: 'Shop created successfully', shop_id : unique_id });
     } catch (error) {
       console.error('Error inserting shop:', error);
   
