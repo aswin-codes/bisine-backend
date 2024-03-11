@@ -134,4 +134,41 @@ router.post('/create',verifyToken, async (req, res) => {
     }
   });
 
+
+//Endpoint to get the shop details along with the list of products from the unique_id
+router.get('/:unique_id',verifyToken, async (req, res) => {
+  const { unique_id } = req.params;
+
+  try {
+    // Get shop details
+    const shopQuery = {
+      text: 'SELECT * FROM shop WHERE unique_id = $1',
+      values: [unique_id],
+    };
+    const shopResult = await pool.query(shopQuery);
+
+    if (shopResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Shop not found' });
+    }
+
+    const shop = shopResult.rows[0];
+
+    // Get products of the shop
+    const productsQuery = {
+      text: 'SELECT * FROM product WHERE shop_id = $1',
+      values: [shop.unique_id],
+    };
+    const productsResult = await pool.query(productsQuery);
+    const products = productsResult.rows;
+
+    // Combine shop details with products
+    const shopWithProducts = { ...shop, products };
+
+    res.status(200).json(shopWithProducts);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;
