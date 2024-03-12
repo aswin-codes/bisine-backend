@@ -8,7 +8,7 @@ const { Pool } = require('pg');
 //     port: 5432
 // }
 
-// const pool = new Pool(credentials);
+//const pool = new Pool(credentials);
 
 const pool = new Pool({
     user: 'aswinraaj2405',

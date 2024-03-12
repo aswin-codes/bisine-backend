@@ -44,4 +44,13 @@ CREATE TABLE product (
     shop_id VARCHAR(255) REFERENCES shop(unique_id) ON DELETE CASCADE
 );
 
+--Review Table 
+CREATE TABLE product_review (
+    review_id SERIAL PRIMARY KEY,
+    description TEXT,
+    date VARCHAR(255),
+    rating FLOAT,
+    user_id INT REFERENCES users(id),
+    product_id INT REFERENCES product(product_id)
+);
 
