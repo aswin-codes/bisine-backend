@@ -6,8 +6,37 @@ dotenv.config();
 
 const router = express.Router();
 
+// Endpoint to fetch all products with shop details
+router.get('/', async (req, res) => {
+  try {
+    const query = `
+      SELECT p.product_id, p.product_name, p.variants, s.name AS shop_name, s.unique_id AS shop_id, s.shop_logo_url, p.product_image_urls
+      FROM product p
+      JOIN shop s ON p.shop_id = s.unique_id
+    `;
+    const { rows } = await pool.query(query);
+
+    const products = rows.map(row => ({
+      product: {
+        product_id: row.product_id,
+        product_name: row.product_name,
+        variants: row.variants,
+        product_image_urls: row.product_image_urls
+      },
+      shop_name: row.shop_name,
+      shop_id: row.shop_id,
+      shop_logo_url: row.shop_logo_url
+    }));
+
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 //Endpoint to fetch the product details with all reviews it had.
-router.get('/:id', verifyToken, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const productId = req.params.id;
 
@@ -21,7 +50,7 @@ router.get('/:id', verifyToken, async (req, res) => {
     const productResult = await pool.query(productQuery, [productId]);
 
     if (productResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: "Product not found" });
     }
 
     const product = productResult.rows[0];
@@ -35,29 +64,40 @@ router.get('/:id', verifyToken, async (req, res) => {
     `;
     const reviewsResult = await pool.query(reviewsQuery, [productId]);
 
+    // Calculate the average rating
+    let totalRating = 0;
+    reviewsResult.rows.forEach((review) => {
+      totalRating += review.rating;
+    });
+    const averageRating = reviewsResult.rows.length > 0 ? totalRating / reviewsResult.rows.length : 0;
+
     product.reviews = reviewsResult.rows;
+    product.average_rating = averageRating;
 
     res.json(product);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
+
+
+
 // Endpoint to store product details
 router.post("/create", async (req, res) => {
-    const {
-      product_name,
-      product_description,
-      product_tags,
-      product_image_urls,
-      variants,
-      shop_id,
-    } = req.body;
-  
-    try {
-      // Insert product details into the database
-      const query = `
+  const {
+    product_name,
+    product_description,
+    product_tags,
+    product_image_urls,
+    variants,
+    shop_id,
+  } = req.body;
+
+  try {
+    // Insert product details into the database
+    const query = `
           INSERT INTO product (
             product_name,
             product_description,
@@ -67,25 +107,24 @@ router.post("/create", async (req, res) => {
             shop_id
           ) VALUES ($1, $2, $3, $4, $5, $6)
         `;
-  
-      const values = [
-        product_name,
-        product_description,
-        product_tags,
-        product_image_urls,
-        variants,
-        shop_id,
-      ];
-  
-      await pool.query(query, values);
-  
-      res.status(201).json({ message: "Product created successfully" });
-    } catch (error) {
-      console.error("Error inserting product:", error);
-  
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-  
+
+    const values = [
+      product_name,
+      product_description,
+      product_tags,
+      product_image_urls,
+      variants,
+      shop_id,
+    ];
+
+    await pool.query(query, values);
+
+    res.status(201).json({ message: "Product created successfully" });
+  } catch (error) {
+    console.error("Error inserting product:", error);
+
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;

@@ -63,7 +63,8 @@ router.post('/create',verifyToken, async (req, res) => {
       contact_number,
       business_email,
       social_media_link,
-      owner_email
+      owner_email,
+      owner_id
     } = req.body;
   
     if (!unique_id) {
@@ -91,8 +92,9 @@ router.post('/create',verifyToken, async (req, res) => {
           contact_number,
           business_email,
           social_media_link,
-          owner_email
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+          owner_email,
+          owner_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,$16)
       `;
   
       const values = [
@@ -110,7 +112,8 @@ router.post('/create',verifyToken, async (req, res) => {
         contact_number,
         business_email,
         social_media_link,
-        owner_email
+        owner_email,
+        owner_id
       ];
   
       await pool.query(query, values);
