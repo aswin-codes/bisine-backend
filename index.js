@@ -15,6 +15,7 @@ const productRouter = require("./Router/product.js")
 const reviewRouter = require("./Router/review.js");
 const orderRouter = require("./Router/order.js")
 const cartRouter = require("./Router/cart.js")
+const adminRouter = require("./Router/admin.js")
 
 
 server.use(express.json());
@@ -30,8 +31,9 @@ server.use("/api/user",userRouter);
 server.use("/api/shop",shopRouter);
 server.use("/api/product",productRouter);
 server.use("/api/review",reviewRouter);
-server.use("/api/order",orderRouter)
-server.use("/api/cart",cartRouter)
+server.use("/api/order",orderRouter);
+server.use("/api/cart",cartRouter);
+server.use("/api/admin",adminRouter);
 
 
 server.listen(3000,() => {
