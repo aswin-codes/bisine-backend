@@ -4,7 +4,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     profile_url VARCHAR(255),
     full_name VARCHAR(100) NOT NULL,
-    phone_number VARCHAR(15),
+    phone_number VARCHAR(15)
 );
 
 --Shop Table
@@ -69,7 +69,7 @@ CREATE TABLE orders (
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_cost DECIMAL(10, 2),
     delivery_address_id INT REFERENCES addresses(id),  -- Foreign key referencing the delivery_addresses table
-    delivery_method VARCHAR(100),
+    delivery_method VARCHAR(100)
 );
 
 --For storing the ordered items
