@@ -94,7 +94,7 @@ router.post('/create',verifyToken, async (req, res) => {
           social_media_link,
           owner_email,
           owner_id
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,$16)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,$16) RETURNING unique_id
       `;
   
       const values = [
@@ -115,9 +115,8 @@ router.post('/create',verifyToken, async (req, res) => {
         owner_email,
         owner_id
       ];
-  
-      await pool.query(query, values);
-  
+  await pool.query(query, values);
+
       res.status(201).json({ message: 'Shop created successfully', shop_id : unique_id });
     } catch (error) {
       console.error('Error inserting shop:', error);
