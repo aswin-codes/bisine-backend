@@ -5,8 +5,9 @@ dotenv.config();
 
 const corsOptions = {
     origin: 'https://bisinevite.vercel.app',
-    credentials: true // Enable credentials (cookies, authorization headers, etc.)
-  };
+    credentials: true ,// Enable credentials (cookies, authorization headers, etc.)
+    methods: ["PUT","DELETE","POST","GET"]
+};
 
 const server = express();
 const userRouter = require('./Router/user.js');
