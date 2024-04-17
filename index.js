@@ -4,7 +4,7 @@ const cors = require('cors')
 dotenv.config();
 
 const corsOptions = {
-    origin: 'https://bisinevite.vercel.app',
+    origin: 'https://bisinevite.vercel.app/',
     credentials: true // Enable credentials (cookies, authorization headers, etc.)
   };
 
@@ -19,8 +19,8 @@ const adminRouter = require("./Router/admin.js")
 
 
 server.use(express.json());
-//server.use(cors(corsOptions));
-server.use(cors())
+server.use(cors(corsOptions));
+//server.use(cors())
 server.get('/test', async (req,res) => {
     res.send({
         msg : "Server is running"
