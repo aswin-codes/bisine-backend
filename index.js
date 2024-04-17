@@ -19,7 +19,7 @@ const orderRouter = require("./Router/order.js")
 const cartRouter = require("./Router/cart.js")
 const adminRouter = require("./Router/admin.js")
 
-server.options("*",cors())
+
 server.use(express.json());
 server.use(cors(corsOptions));
 //server.use(cors())

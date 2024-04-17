@@ -35,7 +35,7 @@ router.get("/shop/:shopId", async (req, res) => {
 });
 
 // Endpoint to update the details of a product by ID
-router.put("/product/edit/:productId", verifyToken, async (req, res) => {
+router.put("/product/edit/:productId",  async (req, res) => {
   try {
     const { productId } = req.params;
     const {
