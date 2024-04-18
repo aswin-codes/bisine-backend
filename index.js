@@ -4,7 +4,7 @@ const cors = require('cors')
 dotenv.config();
 
 const corsOptions = {
-    origin: ['http://localhost:5173','http://bisinevite.vercel.app'],
+    origin: ['http://localhost:5173','https://bisinevite.vercel.app'],
     credentials: true ,// Enable credentials (cookies, authorization headers, etc.)
     methods: ["PUT","DELETE","POST","GET"],
     allowedHeaders: ['Content-Type', 'Authorization']
