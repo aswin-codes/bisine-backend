@@ -138,7 +138,7 @@ router.post('/create',verifyToken, async (req, res) => {
 
 
 //Endpoint to get the shop details along with the list of products from the unique_id
-router.get('/:unique_id',verifyToken, async (req, res) => {
+router.get('/:unique_id',async (req, res) => {
   const { unique_id } = req.params;
 
   try {
