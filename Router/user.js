@@ -25,7 +25,12 @@ async function createUser(user) {
   try {
     const query =
       "INSERT INTO users (email, profile_url, full_name, phone_number) VALUES ($1, $2, $3, $4 ) RETURNING *";
-    const {rows} = await pool.query(query, [email, profileURL, fullName, phoneNumber]);
+    const { rows } = await pool.query(query, [
+      email,
+      profileURL,
+      fullName,
+      phoneNumber,
+    ]);
     return rows[0];
   } catch (error) {
     console.error("Error creating user:", error);
@@ -46,14 +51,19 @@ router.post("/auth", async (req, res) => {
       const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
         expiresIn: "14h",
       });
-      const {rows} = await pool.query("SELECT unique_id FROM shop WHERE owner_id = $1",[user.id])
+      const { rows } = await pool.query(
+        "SELECT unique_id FROM shop WHERE owner_id = $1",
+        [user.id]
+      );
 
       let unique_id = null;
       if (rows[0]) {
-        unique_id = rows[0].unique_id
+        unique_id = rows[0].unique_id;
       }
-      
-      res.status(200).json({ user, shop:{shopId: unique_id}, access_token: token });
+
+      res
+        .status(200)
+        .json({ user, shop: { shopId: unique_id }, access_token: token });
     } else {
       // User does not exist, send status code 404
       res.status(404).json({ error: "User not found" });
@@ -78,7 +88,12 @@ router.post("/register", async (req, res) => {
       res.status(409).json({ error: "User already exists" });
     } else {
       // Create a new user
-      const user = await createUser({ email, fullName, profileURL, phoneNumber });
+      const user = await createUser({
+        email,
+        fullName,
+        profileURL,
+        phoneNumber,
+      });
 
       // Generate JWT token
       const token = jwt.sign({ email, fullName }, process.env.SECRET_KEY);
@@ -86,7 +101,12 @@ router.post("/register", async (req, res) => {
       // Send response with token and success message
       res
         .status(201)
-        .json({ user, shop: {shopId:null},access_token: token, message: "User created successfully" });
+        .json({
+          user,
+          shop: { shopId: null },
+          access_token: token,
+          message: "User created successfully",
+        });
     }
   } catch (error) {
     // Handle server errors
@@ -115,19 +135,62 @@ router.post("/addresses", verifyToken, async (req, res) => {
   }
 });
 
+//Endpoint for test username and password
+router.post("/test", async (req, res) => {
+  const { username, password } = req.body;
+  if (username == "testadmin" && password == "testpassword") {
+    try {
+      // Check if the user exists in the database
+      const user = await getUserByEmail("testme2405@gmail.com");
+
+      if (user) {
+        // User exists, generate JWT token and send user details
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
+          expiresIn: "14h",
+        });
+        const { rows } = await pool.query(
+          "SELECT unique_id FROM shop WHERE owner_id = $1",
+          [user.id]
+        );
+
+        let unique_id = null;
+        if (rows[0]) {
+          unique_id = rows[0].unique_id;
+        }
+
+        res
+          .status(200)
+          .json({ user, shop: { shopId: unique_id }, access_token: token });
+      } else {
+        // User does not exist, send status code 404
+        res.status(404).json({ error: "User not found" });
+      }
+    } catch (error) {
+      // Handle server errors
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  } else {
+    res.status(401).json({
+      message : "Incorrect username and password"
+    })
+  }
+});
+
 // Endpoint to retrieve all addresses of a user
-router.get('/:user_id/addresses',verifyToken, async (req, res) => {
+router.get("/:user_id/addresses", verifyToken, async (req, res) => {
   try {
     const { user_id } = req.params;
 
     // Retrieve addresses of the user from the database
-    const query = 'SELECT id, flat, area, city, state, pincode, landmark FROM addresses WHERE user_id = $1';
+    const query =
+      "SELECT id, flat, area, city, state, pincode, landmark FROM addresses WHERE user_id = $1";
     const result = await pool.query(query, [user_id]);
 
     res.status(200).json({ addresses: result.rows });
   } catch (error) {
-    console.error('Error retrieving addresses:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error retrieving addresses:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
