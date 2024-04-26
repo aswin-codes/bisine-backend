@@ -138,7 +138,7 @@ router.post("/addresses", verifyToken, async (req, res) => {
 //Endpoint for test username and password
 router.post("/test", async (req, res) => {
   const { username, password } = req.body;
-  if ( true) {
+  if ( (username == "testusername" || username == "testadmin") && (password == "testpassword") ) {
     try {
       // Check if the user exists in the database
       const user = await getUserByEmail("testme2405@gmail.com");
