@@ -73,10 +73,11 @@ CREATE TABLE orders (
 );
 
 --For storing the ordered items
+--For storing the ordered items
 CREATE TABLE order_items (
     order_item_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(order_id),
-    product_id INT REFERENCES product(product_id),
+    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     variant_name VARCHAR(255),
     quantity INT,
     unit_price DECIMAL(10, 2),
@@ -85,12 +86,13 @@ CREATE TABLE order_items (
     status VARCHAR(255)
 );
 
+
 --For storing the cancelled orders data
 CREATE TABLE cancelled_orders (
     cancelled_order_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(order_id) ON DELETE CASCADE,
     customer_id INT REFERENCES users(id),
-    product_id INT REFERENCES product(product_id),
+    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     variant_name VARCHAR(255),
     quantity INT,
     unit_price DECIMAL(10, 2),
@@ -104,7 +106,7 @@ CREATE TABLE cancelled_orders (
 CREATE TABLE user_cart (
     cart_item_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id),
-    product_id INT REFERENCES product(product_id),
+    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     shop_id VARCHAR(255) REFERENCES shop(unique_id),
     variant_name VARCHAR(255)
 );
