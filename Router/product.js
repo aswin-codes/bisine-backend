@@ -127,4 +127,33 @@ router.post("/create", async (req, res) => {
   }
 });
 
+router.delete('/delete/:id', async (req, res) => {
+  const productId = req.params.id;
+
+  try {
+    // Begin transaction
+    await pool.query('BEGIN');
+    
+    // Delete product reviews associated with the product
+    await pool.query('DELETE FROM product_review WHERE product_id = $1', [productId]);
+    
+    // Delete product from the product table
+    const result = await pool.query('DELETE FROM product WHERE product_id = $1 RETURNING *', [productId]);
+    
+    // Commit transaction
+    await pool.query('COMMIT');
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json({ message: 'Product deleted successfully', product: result.rows[0] });
+  } catch (err) {
+    // Rollback transaction in case of error
+    await pool.query('ROLLBACK');
+    console.error(err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
