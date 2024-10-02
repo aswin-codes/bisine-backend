@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const pool = require("../db");
+const moment = require('moment')
 const dotenv = require("dotenv");
 const verifyToken = require("../Services/jwtverfication");
 dotenv.config();
@@ -136,6 +137,66 @@ router.post('/create',verifyToken, async (req, res) => {
     }
   });
 
+// Endpoint to get sales data for a specific shop
+router.get('/get-sales-data', async (req, res) => {
+  const { shopId } = req.query; // Get shop ID from query parameters
+  console.log(shopId)
+  if (!shopId) {
+      return res.status(400).json({ success: false, message: 'Shop ID is required' });
+  }
+
+  const periods = [
+      { label: 'last_3_months', duration: '3 months' },
+      { label: 'last_6_months', duration: '6 months' },
+      { label: 'last_12_months', duration: '12 months' },
+  ];
+
+  try {
+      const results = {};
+
+      for (const period of periods) {
+          const startDate = moment().subtract(period.duration).startOf('month').toISOString();
+          const endDate = moment().endOf('month').toISOString();
+
+          // Query to get sales data with product details for a specific shop
+          const query = `
+              SELECT 
+                  o.order_date,
+                  oi.product_id,
+                  p.product_name,
+                  p.product_description,
+                  oi.quantity,
+                  oi.unit_price,
+                  oi.total_price
+              FROM 
+                  orders o
+              JOIN 
+                  order_items oi ON o.order_id = oi.order_id
+              JOIN 
+                  product p ON oi.product_id = p.product_id
+              JOIN 
+                  shop s ON p.shop_id = s.unique_id  -- Ensure to join with shop
+              WHERE 
+                  o.order_date >= $1 
+                  AND o.order_date <= $2
+                  AND s.unique_id = $3  -- Filter by shop ID
+              ORDER BY 
+                  o.order_date;
+          `;
+
+          const { rows } = await pool.query(query, [startDate, endDate, shopId]);
+          results[period.label] = rows;
+      }
+
+      res.json({
+          success: true,
+          data: results,
+      });
+  } catch (error) {
+      console.error('Error retrieving sales data:', error);
+      res.status(500).json({ success: false, message: 'Error retrieving sales data' });
+  }
+});
 
 //Endpoint to get the shop details along with the list of products from the unique_id
 router.get('/:unique_id',async (req, res) => {
@@ -172,5 +233,9 @@ router.get('/:unique_id',async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+
+
 
 module.exports = router;
