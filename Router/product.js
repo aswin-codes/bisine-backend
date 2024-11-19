@@ -3,6 +3,34 @@ const pool = require("../db");
 const dotenv = require("dotenv");
 const verifyToken = require("../Services/jwtverfication");
 dotenv.config();
+const AWS = require('aws-sdk');
+
+AWS.config.update({
+  accessKeyId: 'AKIA2MNVLS4EC2LF3R4H',
+  secretAccessKey: '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',
+  region: 'ap-south-1',
+});
+
+const sns = new AWS.SNS();
+
+// Function to publish a new product notification
+const publishNewProductNotification = async (productName, productDetails) => {
+  const topicArn = 'arn:aws:sns:ap-south-1:713881786120:ProductNotification';
+  
+  const params = {
+    TopicArn: topicArn,
+    Message: `A new product has been published!\n\nProduct Name: ${productName}\nDetails: ${productDetails}`,
+    Subject: 'New Product Notification',
+  };
+
+  try {
+    const result = await sns.publish(params).promise();
+    console.log('Notification sent successfully:', result);
+  } catch (error) {
+    console.error('Error sending notification:', error);
+  }
+};
+
 
 const router = express.Router();
 
@@ -118,7 +146,7 @@ router.post("/create", async (req, res) => {
     ];
 
     await pool.query(query, values);
-
+    publishNewProductNotification('Awesome Gadget', 'This gadget will make your life easier!');
     res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
     console.error("Error inserting product:", error);
