@@ -11,10 +11,10 @@
   // const pool = new Pool(credentials);
 
   const pool = new Pool({
-      user: 'postgres',
-      host: 'database-1.cb6gyskgg2ks.ap-south-1.rds.amazonaws.com',
-      database: 'postgres',
-      password: 'aswin2405',
+      user: 'aswinraaj2405',
+      host: 'ep-yellow-shape-36279017.ap-southeast-1.aws.neon.tech',
+      database: 'bisine',
+      password: '8TCxeBGHVOP3',
       port: 5432,
       ssl: {rejectUnauthorized: false},
       connect: {
