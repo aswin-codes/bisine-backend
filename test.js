@@ -1,8 +1,10 @@
 const AWS = require('aws-sdk');
+const dotenv = require("dotenv");
+dotenv.config();
 
 AWS.config.update({
-  accessKeyId: 'AKIA2MNVLS4EC2LF3R4H',
-  secretAccessKey: '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',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: 'ap-south-1',
 });
 
@@ -26,5 +28,4 @@ const publishNewProductNotification = async (productName, productDetails) => {
   }
 };
 
-// Example usage
 publishNewProductNotification('Awesome Gadget', 'This gadget will make your life easier!');
